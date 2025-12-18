@@ -1,0 +1,81 @@
+* { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Segoe UI', sans-serif; }
+
+body, html { height: 100%; }
+
+.login-wrapper {
+    display: flex;
+    height: 100vh;
+    width: 100%;
+}
+
+/* IZQUIERDA: Imagen de fondo */
+.bg-image {
+    width: 60%;
+    /* Usé una imagen de oficina genérica, puedes cambiar la URL por la tuya */
+    background: url('https://images.unsplash.com/photo-1497215728101-856f4ea42174?q=80&w=2070&auto=format&fit=crop') no-repeat center center;
+    background-size: cover;
+    position: relative;
+    display: flex;
+    align-items: flex-end;
+    padding: 50px;
+}
+
+.bg-image::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; right: 0; bottom: 0;
+    background: rgba(0, 0, 0, 0.4); /* Oscurece un poco la imagen */
+}
+
+.capa-texto {
+    position: relative;
+    z-index: 2;
+    color: white;
+}
+.capa-texto h2 { font-size: 3rem; margin-bottom: 10px; }
+.capa-texto p { font-size: 1.2rem; opacity: 0.9; }
+
+/* DERECHA: Formulario */
+.form-section {
+    width: 40%;
+    background: white;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 40px;
+}
+
+.login-container { width: 100%; max-width: 350px; }
+
+h2 { color: #333; margin-bottom: 10px; }
+
+label { display: block; margin-bottom: 8px; color: #555; font-weight: 600; font-size: 0.9rem; }
+
+input {
+    width: 100%;
+    padding: 12px;
+    margin-bottom: 20px;
+    border: 1px solid #ddd;
+    border-radius: 6px;
+    font-size: 1rem;
+    background-color: #f9f9f9;
+}
+
+button {
+    width: 100%;
+    padding: 14px;
+    background: #4F46E5; /* Color azul violeta moderno */
+    color: white;
+    border: none;
+    border-radius: 6px;
+    font-size: 1rem;
+    font-weight: bold;
+    cursor: pointer;
+    transition: background 0.3s;
+}
+
+button:hover { background: #4338ca; }
+
+.error { color: red; background: #fee; padding: 10px; border-radius: 4px; margin-bottom: 15px; font-size: 0.9rem; }
+.register-link { margin-top: 20px; text-align: center; font-size: 0.9rem; }
+.register-link a { color: #4F46E5; text-decoration: none; font-weight: bold; }
