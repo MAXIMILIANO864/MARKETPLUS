@@ -1,0 +1,53 @@
+<?php
+include 'proteger.php';
+include 'conexion.php';
+
+if ($_SESSION['rol'] != 'admin') die("Acceso denegado.");
+
+if (!isset($_GET['id'])) header("Location: ver_productos.php");
+$id_original = $_GET['id'];
+
+// Buscar datos del producto
+$producto = $conexion->query("SELECT * FROM producto WHERE id_producto = '$id_original'")->fetch_assoc();
+?>
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>Editar Producto</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <?php include 'menu.php'; ?>
+    <div class="dashboard-container">
+        <div class="content" style="max-width: 500px; margin: 0 auto;">
+            <h2 style="color: #f59e0b;">✏️ Modificar Producto</h2>
+            
+            <form action="actualizar_producto.php" method="POST">
+                
+                <input type="hidden" name="id_original" value="<?php echo $producto['id_producto']; ?>">
+
+                <label>ID del Producto:</label>
+                <p style="font-size:12px; color:red; margin-top:-5px;">⚠️ Cuidado al cambiar esto.</p>
+                <input type="number" name="id_nuevo" value="<?php echo $producto['id_producto']; ?>" required>
+
+                <label>Nombre:</label>
+                <input type="text" name="descripcion" value="<?php echo $producto['descripcion']; ?>" required>
+
+                <label>Precio ($):</label>
+                <input type="number" name="precio" step="0.01" value="<?php echo $producto['precio']; ?>" required>
+
+                <label>Sucursal:</label>
+                <select name="sucursal" required>
+                    <option value="Centro" <?php if($producto['sucursal'] == 'Centro') echo 'selected'; ?>>Sucursal Centro</option>
+                    <option value="Norte" <?php if($producto['sucursal'] == 'Norte') echo 'selected'; ?>>Sucursal Norte</option>
+                </select>
+
+                <br>
+                <button type="submit" class="btn-main" style="width:100%; background-color: #f59e0b;">Guardar Cambios</button>
+                <a href="ver_productos.php" style="display:block; text-align:center; margin-top:15px; color:#666;">Cancelar</a>
+            </form>
+        </div>
+    </div>
+</body>
+</html>
