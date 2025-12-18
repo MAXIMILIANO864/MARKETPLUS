@@ -1,0 +1,88 @@
+<?php
+include 'proteger.php';
+include 'conexion.php';
+
+if (!isset($_GET['id'])) die("Falta ID de reporte");
+$id_reporte = $_GET['id'];
+
+// 1. OBTENEMOS LOS DATOS DEL REPORTE GUARDADO (CABECERA)
+$sql_header = "SELECT * FROM reportes_guardados WHERE id_reporte = '$id_reporte'";
+$reporte = $conexion->query($sql_header)->fetch_assoc();
+
+$fecha_inicio = $reporte['fecha_inicio'];
+$fecha_fin = $reporte['fecha_fin'];
+
+// 2. OBTENEMOS EL DETALLE DE VENTAS (Igual que antes)
+$sql_detalle = "SELECT nv.fecha, CONCAT(c.nombre, ' ', c.apellido) as cliente, p.descripcion as producto, v.cantidad, p.precio, (v.cantidad * p.precio) as total
+                FROM numero_venta nv JOIN ventas v ON nv.id_numero_venta = v.id_venta JOIN clientes c ON nv.id_clientes = c.id_cliente JOIN producto p ON v.id_producto = p.id_producto
+                WHERE nv.fecha BETWEEN '$fecha_inicio' AND '$fecha_fin' ORDER BY nv.fecha DESC";
+$detalles = $conexion->query($sql_detalle);
+?>
+
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>Reporte #<?php echo $id_reporte; ?></title>
+    <style>
+        body { font-family: 'Segoe UI', sans-serif; padding: 40px; color: #333; }
+        .header { border-bottom: 2px solid #333; padding-bottom: 20px; margin-bottom: 30px; }
+        .resumen-box { 
+            display: flex; justify-content: space-between; 
+            background: #f9fafb; padding: 15px; border: 1px solid #ddd; margin-bottom: 30px; 
+        }
+        .dato { text-align: center; }
+        .dato h3 { margin: 0; font-size: 12px; color: #666; text-transform: uppercase; }
+        .dato p { margin: 5px 0 0; font-weight: bold; color: #000; }
+        
+        table { width: 100%; border-collapse: collapse; font-size: 12px; }
+        th { text-align: left; background: #eee; padding: 8px; border-bottom: 1px solid #ccc; }
+        td { padding: 8px; border-bottom: 1px solid #eee; }
+        .no-print { position: fixed; bottom: 20px; right: 20px; padding: 15px 30px; background: #e11d48; color: white; border: none; cursor: pointer; font-weight: bold; border-radius: 30px; }
+        @media print { .no-print { display: none; } body { padding: 0; } }
+    </style>
+</head>
+<body>
+    <button onclick="window.print()" class="no-print">🖨️ Imprimir / PDF</button>
+
+    <div class="header">
+        <h1 style="margin:0;">MarketOS - Reporte de Ventas</h1>
+        <p>ID: #<?php echo $reporte['id_reporte']; ?> | Fecha: <?php echo date("d/m/Y H:i", strtotime($reporte['fecha_generacion'])); ?></p>
+        <p>Rango: Del <strong><?php echo date("d/m/Y", strtotime($fecha_inicio)); ?></strong> al <strong><?php echo date("d/m/Y", strtotime($fecha_fin)); ?></strong></p>
+    </div>
+
+    <div class="resumen-box">
+        <div class="dato">
+            <h3>👑 Mejor Cliente</h3>
+            <p><?php echo $reporte['mejor_cliente']; ?></p>
+        </div>
+        <div class="dato">
+            <h3>💼 Empleado Top</h3>
+            <p><?php echo $reporte['mejor_empleado']; ?></p>
+        </div>
+        <div class="dato">
+            <h3>📦 Top Producto</h3>
+            <p><?php echo $reporte['producto_estrella']; ?></p>
+        </div>
+        <div class="dato">
+            <h3>💰 Ingresos Totales</h3>
+            <p>$<?php echo number_format($reporte['total_ventas'], 2); ?></p>
+        </div>
+    </div>
+
+    <table>
+        <thead><tr><th>Fecha</th><th>Cliente</th><th>Producto</th><th>Cant.</th><th style="text-align:right;">Total</th></tr></thead>
+        <tbody>
+            <?php while($d = $detalles->fetch_assoc()) { ?>
+            <tr>
+                <td><?php echo date("d/m/Y", strtotime($d['fecha'])); ?></td>
+                <td><?php echo $d['cliente']; ?></td>
+                <td><?php echo $d['producto']; ?></td>
+                <td><?php echo $d['cantidad']; ?></td>
+                <td style="text-align:right;">$<?php echo number_format($d['total'], 2); ?></td>
+            </tr>
+            <?php } ?>
+        </tbody>
+    </table>
+</body>
+</html>
